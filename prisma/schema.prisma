@@ -1,0 +1,81 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "cockroachdb"
+  url      = env("DATABASE_URL")
+}
+
+model Widget {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+}
+//2vJ4VxK86K_GxkzEpPvEEw
+
+model Course{
+  id String @id @default(uuid())
+  userId String
+ title String @db.String()
+ description String? @db.String()
+ imageUrl String? @db.String()
+ price Float?
+ isPublished Boolean @default(false)
+
+ categoryId String?
+ category Category? @relation(fields: [categoryId],references: [id])
+
+
+ attachments Attachment[]
+
+ createdAt DateTime @default(now())
+ updatedAt DateTime @updatedAt
+ @@index([categoryId])
+}
+
+
+model Category{
+  id String @id @default(uuid())
+  name String @unique
+  courses Course[]
+}
+
+
+model Attachment{
+  id String @id @default(uuid())
+  name String
+  url String @db.Inet
+
+  courseId String
+  course Course @relation(fields: [courseId],references: [id],onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([courseId])
+}
+
+
+
+
+// Define the `User` table in the database
+// model User {
+//   id       String  @id @default(cuid())
+//   email    String  @unique
+//   password String 
+//   name     String? 
+//   posts    Post[]
+// }
+
+// // Define the `Post` table in the database
+// model Post {
+//   id       String  @id @default(cuid())
+//   title    String
+//   content  String?
+//   authorId String
+//   author   User    @relation(fields: [authorId], references: [id])
+// }
+
+
